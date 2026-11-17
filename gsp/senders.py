@@ -99,7 +99,7 @@ class NoSms:
 
 
 class RecordingSms:
-    """Test double."""
+    """Records texts instead of sending them (SMS_PROVIDER=log, and the tests)."""
 
     def __init__(self):
         self.sent: list[tuple[str, str]] = []
@@ -108,4 +108,5 @@ class RecordingSms:
         if not lead.contact.phone:
             return "skipped: no phone number"
         self.sent.append((lead.contact.phone, text))
-        return f"recorded:{len(self.sent)}"
+        log.info("SMS (not sent, log mode) to=%s: %s", lead.contact.phone, text)
+        return f"logged:{len(self.sent)}"

@@ -166,3 +166,12 @@ def test_approval_streak(pipeline):
     pipeline.update_draft(out.draft_id, sms_text="edited", email_subject=None, email_body=None)
     pipeline.send_draft(out.draft_id)
     assert pipeline.store.approval_streak() == 0
+
+
+def test_booking_details_come_off_the_call_checklist(pipeline):
+    out = pipeline.process_inbound(sms_msg())
+    assert "email" in pipeline.store.get_lead(out.lead_id).missing_details
+    lead = pipeline.record_booking(lead_id=out.lead_id, email="dana@example.com", phone=None, name="Dana W",
+                                   booking=Booking(start_time="x"))
+    assert "email" not in lead.missing_details and "full_name" not in lead.missing_details
+    assert "utility_company" in lead.missing_details

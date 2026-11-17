@@ -289,6 +289,10 @@ class Pipeline:
             lead.contact.email = lead.contact.email or email
             lead.contact.phone = lead.contact.phone or phone
 
+        # The booking form may have filled in contact details - drop them from the call checklist.
+        known = {"full_name": lead.contact.name, "email": lead.contact.email, "phone": lead.contact.phone}
+        lead.missing_details = [d for d in lead.missing_details if not known.get(d)]
+
         lead.booking = booking
         lead.status = LeadStatus.call_scheduled
         lead.stage = 2  # hand-off: Stage 2 (Addition / discovery call) owns it now
@@ -379,7 +383,7 @@ class Pipeline:
             return True
         if not lead.contact.phone:
             return False
-        if self.s.sms_provider == "twilio":
+        if self.s.sms_provider in ("twilio", "log"):
             return True
         if self.s.sms_provider == "gvoice_email":
             return bool(lead.gv_reply_address)

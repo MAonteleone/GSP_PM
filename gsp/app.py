@@ -25,7 +25,7 @@ from .ai import ClaudeLeadAI, FakeLeadAI
 from .config import Settings
 from .models import Booking, Channel, DraftStatus, InboundMessage, LeadStatus, new_id
 from .pipeline import Pipeline
-from .senders import GmailMailer, GoogleVoiceEmailSms, NoSms, OutboxMailer, TwilioSms
+from .senders import GmailMailer, GoogleVoiceEmailSms, NoSms, OutboxMailer, RecordingSms, TwilioSms
 from .store import Store
 
 log = logging.getLogger("gsp")
@@ -48,6 +48,8 @@ def build_pipeline(settings: Settings):
 
     if settings.sms_provider == "twilio":
         sms = TwilioSms(settings.twilio_account_sid, settings.twilio_auth_token, settings.twilio_from_number)
+    elif settings.sms_provider == "log":
+        sms = RecordingSms()
     elif settings.sms_provider == "gvoice_email" and gmail is not None:
         sms = GoogleVoiceEmailSms(mailer)
     else:
